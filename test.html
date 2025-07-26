@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Yjs Test</title>
+  </head>
+  <body>
+    <h3>Collaborative Text Editor</h3>
+    <textarea id="text" style="width:100%; height:200px;"></textarea>
+
+    <script type="module">
+      import * as Y from 'https://esm.sh/yjs'
+      import { WebsocketProvider } from 'https://esm.sh/y-websocket'
+
+      const ydoc = new Y.Doc()
+
+      // Connect to your local WebSocket server
+      const provider = new WebsocketProvider('ws://localhost:8080/my-room', 'my-room', ydoc)
+
+      const ytext = ydoc.getText('shared-text')
+      const textarea = document.getElementById('text')
+
+      // Sync Yjs text with textarea
+      ytext.observe(() => {
+        if (textarea.value !== ytext.toString()) {
+          textarea.value = ytext.toString()
+        }
+      })
+
+      textarea.addEventListener('input', () => {
+        ytext.delete(0, ytext.length)
+        ytext.insert(0, textarea.value)
+      })
+    </script>
+  </body>
+</html>
